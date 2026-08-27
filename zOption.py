@@ -4,7 +4,7 @@ import sys
 from fetchComponent import fetch
 from farbenConfig import f_farbe
 from printDesign import custom_display
-from eOption import e_option as e_reuse
+from haversine import haversine
 
 
 def e_wetter(arg: object)-> object:
@@ -16,9 +16,8 @@ def e_wetter(arg: object)-> object:
             temperature=arg['main']['temp'],
             winfo=arg['weather'][0]['main']
         )
-        p = w.to_string()
-        d = w.to_dict()
-        return p,d
+        
+        return w.to_string(),w.to_dict()
 
 
 def z_option():
@@ -33,7 +32,7 @@ def z_option():
                 postleitzahl_int = int(user_input)
                 if 10000 <= postleitzahl_int <= 99999:
                     f_e = fetch(postleitzahl_int)
-                    p_e = [e_wetter(f_e)[0],e_wetter(f_e)[1]]
+                    p_e = e_wetter(f_e)
                     return p_e
                 else:
                     print(f_farbe("Postleitzahl ist ungültig, muss 5 Ziffern sein.",'red'))
@@ -44,7 +43,7 @@ def z_option():
             else:
                 if user_input.replace(" ","").isalpha():
                     f_s = fetch(user_input)
-                    p_s = [e_wetter(f_s)[0],e_wetter(f_s)[1]]
+                    p_s = e_wetter(f_s)
                     return p_s
                 else:
                     print(f_farbe("Ungültiger Standort, nur Buchstaben eingeben",'red'))
@@ -61,7 +60,25 @@ def z_option():
 
     city_warmer = f_dict_city_val if f_dict_temp_val > s_dict_temp_val else s_dict_city_val
     city_colder = f_dict_city_val if f_dict_temp_val < s_dict_temp_val else s_dict_city_val
-    custom_display(showCustom=True,f_text=f_string,s_text=s_string,text=f"{city_warmer} ist {abs(sum_temp):.2f}°C wärmer und {city_colder} ist {abs(sum_temp):.2f}°C kälter")
 
+    coord_dict = {
+        f_dict_city_val : {'lat':f[1]['Latitude'], 'lon':f[1]['Longitude']},
+        s_dict_city_val : {'lat':s[1]['Latitude'], 'lon':s[1]['Longitude']}
+    }
+
+    result_haversine = haversine(
+    coord_dict[f_dict_city_val]['lat'],
+    coord_dict[f_dict_city_val]['lon'],
+    coord_dict[s_dict_city_val]['lat'],
+    coord_dict[s_dict_city_val]['lon']
+    )
+
+    def display() -> str:
+        return f'''
+        {city_warmer} ist {abs(sum_temp):.2f}°C wärmer und {city_colder} ist {abs(sum_temp):.2f}°C kälter.
+        Der distanz zwischen {f_dict_city_val} und {s_dict_city_val} ist {result_haversine:.2f}km.
+'''
+    res = display()
+    custom_display(showCustom=True,f_text=f_string,s_text=s_string,text=res)
 
                     
