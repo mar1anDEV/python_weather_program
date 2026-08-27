@@ -43,8 +43,3 @@ class Wetter:
             'Temperatur': f"{self.temperatur}",
             'Es ist':  self.winfo.capitalize()
         }
-
-if __name__ == "__main__":
-    wetter = Wetter()
-    wetter.to_string()
-    wetter.to_dict()
