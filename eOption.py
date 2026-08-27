@@ -13,8 +13,8 @@ def e_wetter(arg: object)-> object:
             temperature=arg['main']['temp'],
             winfo=arg['weather'][0]['main']
         )
-        p = w.to_string()
-        return p
+        
+        return w.to_string()
 
 def e_option():
     """Liest eine Stadt oder Postleitzahl ein und ruft bei Bedarf den Fetch auf."""
